@@ -124,3 +124,9 @@ sortable_post_table.sortable({
 		}
 	}
 });
+// cancels dragging operation
+jQuery( document ).keydown(function(e) {
+    if ( 27 === e.keyCode ) {
+        sortable_post_table.sortable( "cancel" );
+    }
+});
