@@ -91,6 +91,10 @@ sortable_post_table.sortable({
 		ui.item.children().css('width','');
 	},
 	update: function(e, ui) {
+		if ( sortable_post_table.hasClass("cancel" ) ) {
+			return false;
+		}
+
 		sortable_post_table.sortable('disable').addClass('spo-updating');
 		ui.item.addClass('spo-updating-row');
 		ui.item.find('.check-column').addClass('spinner is-active');
@@ -124,9 +128,14 @@ sortable_post_table.sortable({
 		}
 	}
 });
-// cancels dragging operation
+
+//Cancels dragging operation
 jQuery( document ).keydown(function(e) {
-    if ( 27 === e.keyCode ) {
-        sortable_post_table.sortable( "cancel" );
-    }
+	if ( 27 === e.keyCode ) {
+		sortable_post_table.addClass("cancel");
+		sortable_post_table.sortable("cancel")
+	}
+	if ( sortable_post_table.hasClass("cancel") ) {
+		sortable_post_table.removeClass("cancel");
+	}
 });
