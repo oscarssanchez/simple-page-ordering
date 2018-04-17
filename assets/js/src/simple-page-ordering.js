@@ -63,6 +63,7 @@ function update_simple_ordering_callback(response) {
 }
 
 var sortable_post_table = jQuery(".wp-list-table tbody");
+
 sortable_post_table.sortable({
 	items: '> tr',
 	cursor: 'move',
@@ -72,11 +73,23 @@ sortable_post_table.sortable({
 	distance: 2,
 	opacity: .8,
 	tolerance: 'pointer',
+
+	create: function() {
+        jQuery( document ).keydown(function(e) {
+            var key = e.key || e.keyCode;
+            if ( 'Escape' === key || 'Esc' === key || 27 === key ) {
+                sortable_post_table.sortable("cancel");
+                sortable_post_table.sortable( 'option', 'disabled', true );
+            }
+        });
+	},
 	start: function(e, ui){
+        cancel = false;
 		if ( typeof(inlineEditPost) !== 'undefined' ) {
 			inlineEditPost.revert();
 		}
 		ui.placeholder.height(ui.item.height());
+
 	},
 	helper: function(e, ui) {
 		var children = ui.children();
@@ -87,13 +100,18 @@ sortable_post_table.sortable({
 		return ui;
 	},
 	stop: function(e, ui) {
+        if ( sortable_post_table.sortable( 'option', 'disabled' ) ) {
+            sortable_post_table.sortable( 'option', 'disabled', false );
+        }
+
 		// remove fixed widths
 		ui.item.children().css('width','');
 	},
 	update: function(e, ui) {
-		if ( sortable_post_table.hasClass("cancel" ) ) {
-			return false;
-		}
+        if ( sortable_post_table.sortable( 'option', 'disabled' ) ) {
+            sortable_post_table.sortable( 'option', 'disabled', false );
+            return false;
+        }
 
 		sortable_post_table.sortable('disable').addClass('spo-updating');
 		ui.item.addClass('spo-updating-row');
@@ -129,13 +147,5 @@ sortable_post_table.sortable({
 	}
 });
 
-//Cancels dragging operation
-jQuery( document ).keydown(function(e) {
-	if ( 27 === e.keyCode ) {
-		sortable_post_table.addClass("cancel");
-		sortable_post_table.sortable("cancel")
-	}
-	if ( sortable_post_table.hasClass("cancel") ) {
-		sortable_post_table.removeClass("cancel");
-	}
-});
+
+
